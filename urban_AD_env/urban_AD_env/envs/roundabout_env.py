@@ -9,14 +9,14 @@ import numpy as np
 
 from urban_AD_env import utils
 #import utils
-from urban_AD_env.envs.abstract import AbstractEnv
+from urban_AD_env.envs.abstract import AD_UrbanEnv
 from urban_AD_env.envs.graphics import EnvViewer
 from urban_AD_env.road.lane import LineType, StraightLane, CircularLane, SineLane
 from urban_AD_env.road.road import Road, RoadNetwork
 from urban_AD_env.vehicle.control import EGO_Vehicle
 import urban_AD_env.vehicle.vehicle_params as vehicle_params
 
-class RoundaboutEnv(AbstractEnv):
+class RoundaboutEnv(AD_UrbanEnv):
 
     COLLISION_REWARD     = -100.0
     HIGH_VELOCITY_REWARD = 0.2 # Only if it's inside the rode
@@ -27,7 +27,7 @@ class RoundaboutEnv(AbstractEnv):
     DISTANCE_TO_GOAL_REWARD = 1.0  
     GOAL_REACHED_REWARD  = 100.0
 
-    DURATION = 60
+    DURATION = 90
 
     DEFAULT_CONFIG = {"other_vehicles_type": "urban_AD_env.vehicle.behavior.IDMVehicle",
                       "incoming_vehicle_destination": None,
@@ -51,77 +51,96 @@ class RoundaboutEnv(AbstractEnv):
 
     def render(self,mode='human'):
         super(RoundaboutEnv, self).render(mode)
-       
-    def compute_reward(self, action):
+        
+    
+    def compute_reward(self, achieved_goal, desired_goal, info={}):
         """            
-        """       
-
-        #### EGO Distance to Goal (position Error)
-        # ego_curr_pos = np.array([self.vehicle.curr_position[0], self.vehicle.curr_position[1]]) # [x, y]                       
-        ego_goal_pos = np.array([self.ego_goal_state[0], self.ego_goal_state[1]]) # [x, y]                               
-
-        self.vehicle.distance_to_goal = self.goal_distance(ego_goal_pos, self.vehicle.curr_position)
-        prev_distance_to_goal = self.goal_distance(ego_goal_pos, self.vehicle.prev_position)
-        
-
-        # HEADING TOWARDS THE GOAL REWARD: (current - previous distances to goal)
-        self.heading_towards_goal_reward = (prev_distance_to_goal - self.vehicle.distance_to_goal) * self.DISTANCE_TO_GOAL_REWARD * 2
-
-        # DECREASING OR INCREADING THE DISTANCE WRT INITIAL POSITION
-        if self.ini_dist_to_goal < 0.1:
-           reward_factor = 1
-        else:
-            reward_factor = ( (-1/self.ini_dist_to_goal) * self.vehicle.distance_to_goal + 1)
+        """  
+        # Compute distance between goal and the achieved goal.        
+        try:
+            if achieved_goal.shape[1]:
+                reward =  (-1.0)* self.goal_distance(achieved_goal[:,:2], desired_goal[:,:2])      
+        except:
+            reward = (-1.0)* self.goal_distance(achieved_goal[:2], desired_goal[:2])
             
-        self.reward_wrt_initial_dist_to_goal = reward_factor * self.DISTANCE_TO_GOAL_REWARD
+        # #################################################################################3
+        # #### EGO Distance to Goal (position Error)
+        # ego_curr_pos = np.array([achieved_goal[0], achieved_goal[1]]) # [x, y]                       
+        # ego_goal_pos = np.array([desired_goal[0], desired_goal[1]]) # [x, y]                               
 
-        self.vehicle.distance_goal_reward = self.heading_towards_goal_reward # + self.reward_wrt_initial_dist_to_goal
+        # self.vehicle.distance_to_goal = self.goal_distance(ego_goal_pos, ego_curr_pos)
+        # prev_distance_to_goal = self.goal_distance(ego_goal_pos, self.vehicle.prev_position)
+        
+
+        # # HEADING TOWARDS THE GOAL REWARD: (current - previous distances to goal)
+        # self.heading_towards_goal_reward = (prev_distance_to_goal - self.vehicle.distance_to_goal) * self.DISTANCE_TO_GOAL_REWARD * 2
+
+        # # DECREASING OR INCREADING THE DISTANCE WRT INITIAL POSITION
+        # if self.ini_dist_to_goal < 0.1:
+        #    reward_factor = 1
+        # else:
+        #     reward_factor = ( (-1/self.ini_dist_to_goal) * self.vehicle.distance_to_goal + 1)
+            
+        # self.reward_wrt_initial_dist_to_goal = reward_factor * self.DISTANCE_TO_GOAL_REWARD
+
+        # self.vehicle.distance_goal_reward = self.heading_towards_goal_reward # + self.reward_wrt_initial_dist_to_goal
 
         
-        # ON/OFF ROAD REWARD
-        self.vehicle.is_on_the_road = self.road.network.is_inside_network(self.vehicle.curr_position)
-        self.vehicle.off_road_reward = self.OFF_ROAD_REWARD * int(not self.vehicle.is_on_the_road)
+        # # ON/OFF ROAD REWARD
+        # self.vehicle.is_on_the_road = self.road.network.is_inside_network(self.vehicle.curr_position)
+        # self.vehicle.off_road_reward = self.OFF_ROAD_REWARD * int(not self.vehicle.is_on_the_road)
 
-        # COLLISION REWARD
-        self.vehicle.collision_reward = self.COLLISION_REWARD * self.vehicle.crashed * abs(self.vehicle.velocity)
+        # # COLLISION REWARD
+        # self.vehicle.collision_reward = self.COLLISION_REWARD * self.vehicle.crashed * abs(self.vehicle.velocity)
         
-        # HIGH VELOCITY REWARD
-        self.vehicle.high_vel_reward = self.HIGH_VELOCITY_REWARD * self.vehicle.velocity_index / max(self.vehicle.SPEED_COUNT - 1, 1)
+        # # HIGH VELOCITY REWARD
+        # self.vehicle.high_vel_reward = self.HIGH_VELOCITY_REWARD * self.vehicle.velocity_index / max(self.vehicle.SPEED_COUNT - 1, 1)
         
-        # REVERESE DRIVING REWARD
-        self.vehicle.reverse_reward = self.REVERSE_REWARD * int(self.vehicle.velocity < 0)
+        # # REVERESE DRIVING REWARD
+        # self.vehicle.reverse_reward = self.REVERSE_REWARD * int(self.vehicle.velocity < 0)
 
-        # LANE CHANGE REWARD
-        #self.vehicle.lane_change_reward = self.LANE_CHANGE_REWARD * (manouver in [0, 2])
+        # # LANE CHANGE REWARD
+        # #self.vehicle.lane_change_reward = self.LANE_CHANGE_REWARD * (manouver in [0, 2])
         
         
-        # return utils.remap(reward, [self.COLLISION_REWARD+self.LANE_CHANGE_REWARD, self.HIGH_VELOCITY_REWARD], [0, 1])
-        #reward = self.vehicle.collision_reward + self.vehicle.high_vel_reward + self.vehicle.lane_change_reward + self.vehicle.off_road_reward + self.vehicle.distance_goal_reward
+        # # return utils.remap(reward, [self.COLLISION_REWARD+self.LANE_CHANGE_REWARD, self.HIGH_VELOCITY_REWARD], [0, 1])
+        # #reward = self.vehicle.collision_reward + self.vehicle.high_vel_reward + self.vehicle.lane_change_reward + self.vehicle.off_road_reward + self.vehicle.distance_goal_reward
 
-        reward = self.vehicle.distance_goal_reward
-                # self.vehicle.reverse_reward
-                #  self.vehicle.off_road_reward + \
-                #  self.vehicle.collision_reward
+        # reward = self.vehicle.distance_goal_reward + \
+        #          self.vehicle.reverse_reward
+        #         #  self.vehicle.off_road_reward + \
+        #         #  self.vehicle.collision_reward
 
-        # GOAL REACHED REWARD
-        if self.vehicle.distance_to_goal < self.distance_threshold:
-            reward += self.GOAL_REACHED_REWARD
+        # # GOAL REACHED REWARD
+        # if np.any(reward) < self.distance_threshold:
+        #     reward += self.GOAL_REACHED_REWARD
 
 
         self.vehicle.reward = reward
 
         return reward
 
-    def _is_terminal(self):
+    def _is_terminal(self, achieved_goal, desired_goal, info={}):
         """
             The episode is over when:
             1) a collision occurs             
-            2) access ramp has been passed.
+            2) Ego has reached the Goal
+            3) Too many steps
         """
+        d = self.goal_distance(achieved_goal[:2], desired_goal[:2])
+
         return self.vehicle.crashed or \
-               self.vehicle.distance_to_goal < self.distance_threshold or \
+               d < self.distance_threshold or \
                self.steps >= self.DURATION
 
+    def _is_success(self, achieved_goal, desired_goal):
+        """
+            The episode is succesful:            
+            1) Ego has reached the Goal            
+        """        
+        return (self.goal_distance(achieved_goal[:2], desired_goal[:2]) < self.distance_threshold).astype(np.float32)
+
+    
     def reset(self):
         self._make_road()
         self._make_vehicles()

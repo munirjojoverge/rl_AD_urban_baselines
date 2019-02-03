@@ -115,8 +115,8 @@ class Vehicle(Loggable):
         :param dt: timestep of integration of the model [s]
         """
         # REVERSE NOT ALLOWED (for any vehicle)
-        if self.velocity <= 0:
-            self.velocity = 0
+        # if self.velocity <= 0:
+        #     self.velocity = 0
 
         if self.crashed:
             self.action['steering'] = 0

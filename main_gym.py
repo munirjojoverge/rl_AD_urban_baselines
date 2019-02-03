@@ -19,14 +19,14 @@ from settings import *
 
 import urban_AD_env
 
-
 def create_args():
     """
     Create an argparse
     """    
     currentDT = datetime.datetime.now()
-    alg = 'ppo2'
-    network = 'mlp'
+    env = 'urban-roundabout-v0'
+    alg = 'her'
+    network = 'default'
 
     # define the name of the directory to be created
     save_path = model_folder + '/' + alg
@@ -39,13 +39,13 @@ def create_args():
         print ("Successfully created the save path folder %s " % save_path)
 
     args = []
-    args.append('--env=urban-roundabout-v0')  # environment ID  
+    args.append('--env=' + env)  # environment ID  
     args.append('--alg='+ alg) # Algorithm
-    args.append('--num_timesteps=0')    
+    args.append('--num_timesteps=1e4')    
     args.append('--num_env=0') # Number of environment copies being run in parallel. When not specified, set to number of cpus for Atari, and to 1 for Mujoco
     args.append('--reward_scale=1.0') # Reward scale factor. Default: 1.0
     args.append('--save_path='+ save_path +'/'+ network + '_' + str(currentDT)) # Path to save trained model to
-    args.append('--load_path='+ save_path +'/'+ network + '_2019-01-30 17:52:01.215011') # Path to save trained model to
+    args.append('--load_path='+ save_path +'/'+ network + '_2019-02-01 18:22:59.659116') # Path to save trained model to
     #args.append('--save_video_interval = 0') #Save video every x steps (0 = disabled)
     #args.append('--save_video_length = 200') # Length of recorded video. Default: 200
     #args.append('--network=' + network) # help='network type (mlp, cnn, lstm, cnn_lstm, conv_only)', default=None)

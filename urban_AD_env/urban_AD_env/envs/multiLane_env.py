@@ -9,13 +9,13 @@ import numpy as np
 from gym import logger
 
 from urban_AD_env import utils
-from urban_AD_env.envs.abstract import AbstractEnv
+from urban_AD_env.envs.abstract import AD_UrbanEnv
 from urban_AD_env.road.road import Road, RoadNetwork
 from urban_AD_env.vehicle.control import EGO_Vehicle
 import urban_AD_env.vehicle.vehicle_params as vehicle_params
 
 
-class MultiLaneEnv(AbstractEnv):
+class MultiLaneEnv(AD_UrbanEnv):
     """
         A urban driving environment.
 

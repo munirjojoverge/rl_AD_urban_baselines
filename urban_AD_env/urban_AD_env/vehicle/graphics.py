@@ -167,25 +167,31 @@ class VehicleGraphics(object):
         color = tmp_color
 
         surface.blit(text, (0, ini_line + line*next_line_step))        
+
+        ### Ego Position        
+        line += 1
+        text = 'Ego Pos (x,y): {:.3f}, {:.3f}'.format(vehicle.curr_position[0], vehicle.curr_position[1])
+        font = pygame.font.SysFont(font_type, size, bold=True)
+        text = font.render(text, True, color)
+        color = tmp_color
+
+        surface.blit(text, (0, ini_line + line*next_line_step))        
         
+        ### Ego Actions        
+        line += 1
+        text = 'Ego Actions (St,Acc): {:.3f}, {:.3f}'.format(vehicle.action['steering'], vehicle.action['acceleration'])
+        font = pygame.font.SysFont(font_type, size, bold=True)
+        text = font.render(text, True, color)
+        color = tmp_color
+
+        surface.blit(text, (0, ini_line + line*next_line_step))        
 
         # Display EGO Goal                    
         pix_pos= surface.pos2pix(vehicle.goal_state[0],vehicle.goal_state[1])
         radius = abs(pix_pos[0] - surface.pos2pix(vehicle.goal_state[0]+3, vehicle.goal_state[1])[0])
         pygame.draw.circle(surface, cls.GREEN, pix_pos, radius)
 
-        # radius = 3
-        # xy1 = surface.pos2pix(vehicle.goal_state[0]+radius, vehicle.goal_state[1]+radius)
-        # xy2 = surface.pos2pix(vehicle.goal_state[0]-radius, vehicle.goal_state[1]-radius)
-        # pygame.draw.ellipse(surface, cls.RED, [xy1[0], xy1[1], xy2[0], xy2[1]], 1) 
-
-
-        # pygame.draw.line(surface, surface.WHITE,
-        #                          (surface.vec2pix(lane.position(starts[k], lats[k]))),
-        #                          (surface.vec2pix(lane.position(ends[k], lats[k]))),
-        #                          max(surface.pix(cls.STRIPE_WIDTH), 1))
-
-        # surface.blit(sr, (surface.pos2pix(v.curr_position[0] - v.LENGTH / 2, v.curr_position[1] - v.LENGTH / 2)))
+        
 
     @classmethod
     def display_trajectory(cls, states, surface):

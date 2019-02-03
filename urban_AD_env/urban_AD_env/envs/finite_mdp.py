@@ -30,7 +30,7 @@ def finite_mdp(env,
 
         Finally, this state is flattened for compatibility with the FiniteMDPEnv environment.
 
-    :param AbstractEnv env: an environment
+    :param AD_UrbanEnv env: an environment
     :param time_quantization: the time quantization used in the state representation [s]
     :param horizon: the horizon on which the collisions are predicted [s]
     """

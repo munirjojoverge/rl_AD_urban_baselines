@@ -22,7 +22,7 @@ from urban_AD_env.vehicle.control import EGO_Vehicle
 from urban_AD_env.vehicle.dynamics import Obstacle
 
 
-class AbstractEnv(gym.GoalEnv):
+class AD_UrbanEnv(gym.GoalEnv):
     """        
         Superclass for all Autonomous Driving Environments       
 
@@ -116,7 +116,7 @@ class AbstractEnv(gym.GoalEnv):
         
         
         self.ini_dist_to_goal = 0.0
-        self._max_episode_steps = 6000
+        self._max_episode_steps = 500
 
     def seed(self, seed=None):
         self.np_random, seed = seeding.np_random(seed)
@@ -129,13 +129,13 @@ class AbstractEnv(gym.GoalEnv):
         """
         # Add ego-vehicle
         df = pandas.DataFrame.from_records([self.vehicle.to_dict()])[self.OBSERVATION_FEATURES]
-        # Normalize values
-        MAX_ROAD_LANES = 4
-        road_width = AbstractLane.DEFAULT_WIDTH * MAX_ROAD_LANES
-        df.loc[0, 'x'] = 0
-        df.loc[0, 'y'] = utils.remap(df.loc[0, 'y'], [0, road_width], [0, 1])
-        df.loc[0, 'vx'] = utils.remap(df.loc[0, 'vx'], [EGO_Vehicle.SPEED_MIN, EGO_Vehicle.SPEED_MAX], [0, 1])
-        df.loc[0, 'vy'] = utils.remap(df.loc[0, 'vy'], [-EGO_Vehicle.SPEED_MAX, EGO_Vehicle.SPEED_MAX], [-1, 1])
+        # # Normalize values
+        # MAX_ROAD_LANES = 4
+        # road_width = AbstractLane.DEFAULT_WIDTH * MAX_ROAD_LANES
+        # df.loc[0, 'x'] = 0
+        # df.loc[0, 'y'] = utils.remap(df.loc[0, 'y'], [0, road_width], [0, 1])
+        # df.loc[0, 'vx'] = utils.remap(df.loc[0, 'vx'], [EGO_Vehicle.SPEED_MIN, EGO_Vehicle.SPEED_MAX], [0, 1])
+        # df.loc[0, 'vy'] = utils.remap(df.loc[0, 'vy'], [-EGO_Vehicle.SPEED_MAX, EGO_Vehicle.SPEED_MAX], [-1, 1])
 
         # Add nearby traffic
         close_vehicles = self.road.closest_vehicles_to(self.vehicle, self.OBSERVATION_VEHICLES)
@@ -145,12 +145,12 @@ class AbstractEnv(gym.GoalEnv):
                  for v in close_vehicles[-self.OBSERVATION_VEHICLES+1:]])[self.OBSERVATION_FEATURES],
                            ignore_index=True)
 
-            # Normalize values
-            delta_v = 2*(EGO_Vehicle.SPEED_MAX - EGO_Vehicle.SPEED_MIN)
-            df.loc[1:, 'x'] = utils.remap(df.loc[1:, 'x'], [-self.PERCEPTION_DISTANCE, self.PERCEPTION_DISTANCE], [-1, 1])
-            df.loc[1:, 'y'] = utils.remap(df.loc[1:, 'y'], [-road_width, road_width], [-1, 1])
-            df.loc[1:, 'vx'] = utils.remap(df.loc[1:, 'vx'], [-delta_v, delta_v], [-1, 1])
-            df.loc[1:, 'vy'] = utils.remap(df.loc[1:, 'vy'], [-delta_v, delta_v], [-1, 1])
+            # # Normalize values
+            # delta_v = 2*(EGO_Vehicle.SPEED_MAX - EGO_Vehicle.SPEED_MIN)
+            # df.loc[1:, 'x'] = utils.remap(df.loc[1:, 'x'], [-self.PERCEPTION_DISTANCE, self.PERCEPTION_DISTANCE], [-1, 1])
+            # df.loc[1:, 'y'] = utils.remap(df.loc[1:, 'y'], [-road_width, road_width], [-1, 1])
+            # df.loc[1:, 'vx'] = utils.remap(df.loc[1:, 'vx'], [-delta_v, delta_v], [-1, 1])
+            # df.loc[1:, 'vy'] = utils.remap(df.loc[1:, 'vy'], [-delta_v, delta_v], [-1, 1])
 
         # Fill missing rows
         if df.shape[0] < self.OBSERVATION_VEHICLES:
@@ -160,10 +160,13 @@ class AbstractEnv(gym.GoalEnv):
         # Reorder
         df = df[self.OBSERVATION_FEATURES]
         # Clip
-        obs = np.clip(df.values, -1, 1)
+        #obs = np.clip(df.values, -1, 1)
+        obs = df.values
+
         # Flatten
         obs = np.ravel(obs)
 
+        # Im going to reduce the "Goal" structure to a simple goal position, No heading, No speed,...
         achieved_goal = np.array([self.vehicle.curr_position[0], self.vehicle.curr_position[1], self.vehicle.heading, self.vehicle.velocity])
         
         return {
@@ -174,9 +177,9 @@ class AbstractEnv(gym.GoalEnv):
 
     def goal_distance(self,goal_a, goal_b):
         assert goal_a.shape == goal_b.shape
-        return float(np.linalg.norm(goal_a - goal_b, axis=-1))
+        return np.linalg.norm(goal_a - goal_b, axis=-1)
         
-    def compute_reward(self, action):
+    def compute_reward(self, achieved_goal, desired_goal, info={}):
         """
             Return the reward associated with performing a given action and ending up in the current state.
 
@@ -185,14 +188,14 @@ class AbstractEnv(gym.GoalEnv):
         """
         raise NotImplementedError()
 
-    def _is_terminal(self):
+    def _is_terminal(self, achieved_goal=None, desired_goal=None, info={}):
         """
             Check whether the current state is a terminal state
         :return:is the state terminal
         """
         raise NotImplementedError()
 
-    def _constraint(self, action):
+    def _constraint(self, achieved_goal, desired_goal, info={}):
         """
             A constraint metric, for budgeted MDP.
 
@@ -201,7 +204,7 @@ class AbstractEnv(gym.GoalEnv):
         :param action: the last action performed
         :return: the constraint signal, the alternate (constraint-free) reward
         """
-        return None, self.compute_reward(action)
+        return None, self.compute_reward(achieved_goal, desired_goal)
 
     def reset(self):
         """
@@ -209,6 +212,15 @@ class AbstractEnv(gym.GoalEnv):
         :return: the observation of the reset state
         """
         raise NotImplementedError()
+
+    def _is_success(self):
+        """
+            The episode is succesful:            
+            1) Ego has reached the Goal
+            
+        """
+        raise NotImplementedError()
+
 
     def step(self, action):
         """
@@ -235,17 +247,20 @@ class AbstractEnv(gym.GoalEnv):
             self._automatic_rendering()
 
             # Stop at terminal states
-            if self.done or self._is_terminal():
+            if self.done or self._is_terminal(self.vehicle.curr_position, self.ego_goal_state[:2]):
                 break
 
         self.enable_auto_render = False
 
         obs = self._get_obs()
-        reward = self.compute_reward(action)
-        terminal = self._is_terminal()
+        reward = self.compute_reward(obs['achieved_goal'], obs['desired_goal'])
+        terminal = self._is_terminal(obs['achieved_goal'], obs['desired_goal'])
 
-        constraint, alt_reward = self._constraint(action)
-        info = {'constraint': constraint, 'alt_reward': alt_reward}
+        is_success = self._is_success(obs['achieved_goal'], obs['desired_goal'])
+        constraint, alt_reward = self._constraint(obs['achieved_goal'], obs['desired_goal'])
+        info = {'constraint': constraint, 'alt_reward': alt_reward, 'is_success' : is_success }
+        info = {'is_success' : is_success }
+        info = {}
 
         return obs, reward, terminal, info
 

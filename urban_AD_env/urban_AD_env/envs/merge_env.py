@@ -8,14 +8,14 @@ from __future__ import division, print_function, absolute_import
 import numpy as np
 
 from urban_AD_env import utils
-from urban_AD_env.envs.abstract import AbstractEnv
+from urban_AD_env.envs.abstract import AD_UrbanEnv
 from urban_AD_env.road.lane import LineType, StraightLane, SineLane
 from urban_AD_env.road.road import Road, RoadNetwork
 from urban_AD_env.vehicle.control import ControlledVehicle, EGO_Vehicle
 from urban_AD_env.vehicle.dynamics import Obstacle
 import urban_AD_env.vehicle.vehicle_params as vehicle_params
 
-class MergeEnv(AbstractEnv):
+class MergeEnv(AD_UrbanEnv):
     """
         A urban merge negotiation environment.
 
