@@ -32,7 +32,9 @@ The Original version of these environments were created by Edouard Leurent and c
 
    3. Look at the other arguments and chose the appropriate values such us where to save, number steps,...
 
-   4. Note: "Save path" does not work on DDPG unless you add to the ddpg class the following and import tf_util (from baselines.common import tf_util):
+   4. Note: "Save path" does not work on DDPG unless you add to the ddpg class the following: 
+   
+      from baselines.common import tf_util
 
       def save(self, save_path):
 
@@ -40,6 +42,6 @@ The Original version of these environments were created by Edouard Leurent and c
 
       "Play" will launch the visualization and run the agent after training. (comment this line if you don't want to run the agent after training or if you can't visualize it - such as when you are training the agent on AWS, for example)
 
-5. Run main.py:
+5. Run main_gym.py:
 
-   python main.py
+   python main_gym.py
