@@ -6,7 +6,7 @@
 
 import sys, os
 from os.path import dirname, abspath
-import datetime
+import time
 
 file_path = sys.argv[0]
 pathname = os.path.dirname(file_path)        
@@ -23,7 +23,7 @@ def create_args():
     """
     Create an argparse
     """    
-    currentDT = datetime.datetime.now()
+    currentDT = time.strftime("%Y%m%d-%H%M%S")
     env = 'urban-roundabout-v0'
     alg = 'her'
     network = 'default'
