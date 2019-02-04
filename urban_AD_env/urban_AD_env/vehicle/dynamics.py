@@ -22,6 +22,8 @@ class Vehicle(Loggable):
     """ Vehicle width [m] """
     DEFAULT_VELOCITIES = [23, 24]
     """ Range for random initial velocities [m/s] """
+    MAX_VELOCITY = 30
+    MIN_VELOCITY = -15
 
     def __init__(self, road, state):
         self.road = road
@@ -126,6 +128,11 @@ class Vehicle(Loggable):
         self.prev_position = self.curr_position.copy()
         self.curr_position += v * dt
         self.heading += self.velocity * np.tan(self.action['steering']) / self.LENGTH * dt
+
+        if self.velocity > self.MAX_VELOCITY:
+            self.action['acceleration'] = min(self.action['acceleration'], 0)
+        elif self.velocity < self.MIN_VELOCITY:
+            self.action['acceleration'] = max(self.action['acceleration'], 0)
         self.velocity += self.action['acceleration'] * dt
 
         if self.road:
