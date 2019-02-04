@@ -58,8 +58,8 @@ class AD_UrbanEnv(gym.GoalEnv):
         The maximum distance of any vehicle present in the observation [m]
     """
 
-    OBSERVATION_FEATURES = ['presence', 'x', 'y', 'vx', 'vy']
-    OBSERVATION_VEHICLES = 5
+    OBSERVATION_FEATURES = ['x', 'y', 'vx', 'vy']
+    OBSERVATION_VEHICLES = 1
 
     def __init__(self, distance_threshold = 5, heading_threshold = 0.08, num_actions = 2, action_space_type='C'):
         """Initializes a new Driving environment.
