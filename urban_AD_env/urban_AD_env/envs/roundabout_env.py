@@ -27,6 +27,7 @@ class RoundaboutEnv(AD_UrbanEnv):
     DISTANCE_TO_GOAL_REWARD = 1.0  
     GOAL_REACHED_REWARD  = 100.0
 
+    OBSERVATION_NORMALIZATION = 100
     DURATION = 90
 
     DEFAULT_CONFIG = {"other_vehicles_type": "urban_AD_env.vehicle.behavior.IDMVehicle",
@@ -47,7 +48,15 @@ class RoundaboutEnv(AD_UrbanEnv):
         self.config.update(config)
 
     def _get_obs(self):
-        return super(RoundaboutEnv, self)._get_obs()
+        obs = super(RoundaboutEnv, self)._get_obs()
+        return {
+            'observation': obs['observation'] / self.OBSERVATION_NORMALIZATION,
+            'achieved_goal':  obs['achieved_goal'] / self.OBSERVATION_NORMALIZATION,
+            'desired_goal':  obs['desired_goal'] / self.OBSERVATION_NORMALIZATION,
+        }
+
+    def goal_distance(self, goal_a, goal_b):
+        return self.OBSERVATION_NORMALIZATION*super(self, RoundaboutEnv).goal_distance(goal_a, goal_b)
 
     def render(self,mode='human'):
         super(RoundaboutEnv, self).render(mode)
