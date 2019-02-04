@@ -41,7 +41,7 @@ def create_args():
     args = []
     args.append('--env=' + env)  # environment ID  
     args.append('--alg='+ alg) # Algorithm
-    args.append('--num_timesteps=1e4')    
+    args.append('--num_timesteps=1e5')
     args.append('--num_env=0') # Number of environment copies being run in parallel. When not specified, set to number of cpus for Atari, and to 1 for Mujoco
     args.append('--reward_scale=1.0') # Reward scale factor. Default: 1.0
     args.append('--save_path='+ save_path +'/'+ network + '_' + str(currentDT)) # Path to save trained model to
