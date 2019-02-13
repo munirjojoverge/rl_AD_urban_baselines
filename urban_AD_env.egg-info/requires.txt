@@ -1,0 +1,14 @@
+gym
+numpy
+pygame
+jupyter
+matplotlib
+pandas
+
+[deploy]
+pytest-runner
+sphinx<1.7.3
+sphinx_rtd_theme
+
+[dev]
+scipy

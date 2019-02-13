@@ -1,0 +1,18 @@
+Metadata-Version: 2.1
+Name: urban-AD-env
+Version: 1.0.dev0
+Summary: An environment for simulated urban_AD driving tasks
+Home-page: https://github.com/eleurent/urban_AD-env
+Author: Edouard Leurent
+Author-email: eleurent@gmail.com
+License: MIT
+Description: UNKNOWN
+Keywords: autonomous urban_AD driving simulation environment reinforcement learning
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Researchers
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 2.7
+Classifier: Programming Language :: Python :: 3.7
+Provides-Extra: dev
+Provides-Extra: deploy

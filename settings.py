@@ -7,6 +7,6 @@
 
 run_folder = './run/'
 logs_folder = run_folder + 'logs'
-model_folder = run_folder + 'models'
+models_folder = run_folder + 'models'
 
-req_dirs = [run_folder, logs_folder, model_folder]
+req_dirs = [run_folder, logs_folder, models_folder]
