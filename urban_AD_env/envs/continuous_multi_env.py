@@ -38,18 +38,18 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
     REVERSE_REWARD       = -0.8
     OFF_ROAD_REWARD      = -0.8    
     AGAINST_TRAIFFIC_REWARD = -0.9  
-    HIGH_VELOCITY_REWARD = 0.6
+    MOVING_REWARD        = +0.2
+    REACHING_GOAL_REWARD = +1.0    
     
     # Reward Weights on the Obs features - below
     DISTANCE_TO_GOAL_REWARD = 2.0
     REWARD_WEIGHTS = [1/100, 1/100, 1/100, 1/100, 1/10, 1/10]
     #REWARD_WEIGHTS = [x * 20.0 for x in REWARD_WEIGHTS]
     
-    SUCCESS_GOAL_REWARD = 0.3
+    SUCCESS_THRESHOLD = 0.3
 
     OBS_SCALE = 100
-    REWARD_SCALE = np.absolute(COLLISION_REWARD)
-    SUCCESS_GOAL_DISTANCE = 1.5
+    REWARD_SCALE = np.absolute(COLLISION_REWARD)    
     HEADING_ERR = np.pi / 4
 
     SCENES =  ['ROUNDABOUT', 'MERGE', 'MULTILANE']   
@@ -243,20 +243,24 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
         # COLLISION REWARD
         collision_reward = self.COLLISION_REWARD * np.squeeze(info["is_collision"])
                 
-        # HIGH VELOCITY REWARD        
-        high_vel_reward = self.HIGH_VELOCITY_REWARD * np.squeeze(info["velocity_idx"]) * distance_to_goal_reward        
+        # MOVING REWARD        
+        moving_reward = self.MOVING_REWARD * np.squeeze(info["velocity_idx"]) * np.abs(distance_to_goal_reward)
         
         # REVERESE DRIVING REWARD
         reverse_reward = self.REVERSE_REWARD * np.squeeze(info["is_reverse"])
 
         # AGAINST TRAFFIC DRIVING REWARD
         against_traffic_reward = self.AGAINST_TRAIFFIC_REWARD * np.squeeze(info["is_against_traffic"])
+
+        # REACHING THE GOAL REWARD
+        reaching_goal_reward = self.REACHING_GOAL_REWARD *  np.squeeze(info["is_success"])
         
         reward = (distance_to_goal_reward + \
                   off_road_reward + \
                   reverse_reward + \
                   against_traffic_reward + \
-                  high_vel_reward +\
+                  moving_reward +\
+                  reaching_goal_reward + \
                   collision_reward)
 
         # self.REWARD_SCALE = np.max(np.absolute([distance_to_goal_reward, off_road_reward, reverse_reward, against_traffic_reward, collision_reward]))
@@ -268,7 +272,7 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
         # DISTANCE TO GOAL
         distance_to_goal_reward = self.distance_2_goal_reward(achieved_goal, desired_goal)
         #print(distance_to_goal_reward)
-        return distance_to_goal_reward > -self.SUCCESS_GOAL_REWARD
+        return distance_to_goal_reward > -self.SUCCESS_THRESHOLD
 
     def compute_reward_2(self, achieved_goal, desired_goal, info):
         """
@@ -293,7 +297,7 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
         
         # # HIGH VELOCITY REWARD
         # achieved_speed = np.linalg.norm([achieved_goal[2], achieved_goal[3]])
-        # high_vel_reward = self.HIGH_VELOCITY_REWARD * achieved_speed
+        # moving_reward = self.MOVING_REWARD * achieved_speed
         
         # REVERESE DRIVING REWARD
         reverse_reward = self.REVERSE_REWARD * np.squeeze(info["is_reverse"])
@@ -314,7 +318,13 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
     def _is_success_2(self, achieved_goal, desired_goal):
         # d = goal_distance(achieved_goal, desired_goal) * self.OBS_SCALE
         # return (d < self.SUCCESS_GOAL_DISTANCE).astype(np.float32)
-        return np.linalg.norm(achieved_goal - desired_goal) * self.OBS_SCALE < self.SUCCESS_GOAL_DISTANCE
+        #return np.linalg.norm(achieved_goal - desired_goal) * self.OBS_SCALE < self.SUCCESS_GOAL_DISTANCE
+
+        # DISTANCE TO GOAL
+        distance_to_goal_reward = self.distance_2_goal_reward(achieved_goal, desired_goal)
+        #print(distance_to_goal_reward)
+        self.vehicle.is_success = (distance_to_goal_reward > -self.SUCCESS_THRESHOLD)
+        return self.vehicle.is_success
           
 
     def _is_terminal(self):
@@ -323,5 +333,7 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
         """
         # The episode cannot terminate unless all time steps are done. The reason for this is that HER + DDPG uses constant
         # length episodes. If you plan to use other algorithms, please uncomment this line
+        if self.vehicle.crashed or self.vehicle.is_success:
+            self.reset()
         return False # self.vehicle.crashed or self._is_success(obs['achieved_goal'], obs['desired_goal'])
     

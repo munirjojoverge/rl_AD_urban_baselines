@@ -42,13 +42,13 @@ def default_args():
     ###############################################################
     #            DEFINE YOUR "BASELINES" PARAMETERS HERE 
     ###############################################################
-    env = 'continuous-multi-env-v1' #'continuous-env-v1' 'parking-v1'
+    env = 'parking-v1' #'continuous-multi-env-v1' #'continuous-env-v1' 'parking-v1'
     alg = 'her'
     network = 'default'
-    num_timesteps = '3e0'
+    num_timesteps = '1e6'
     save_folder = models_folder + '/' + env
-    save_path = save_folder +'/'+ alg + '_' + network + '_obs5_' + str(currentDT)
-    load_path = save_folder +'/'+ 'her_default_20190212-141935' # Good with just Ego
+    save_path = save_folder +'/'+ alg + '_' + network + '_obs_4_' + str(currentDT)
+    load_path = save_folder +'/'+ 'her_default_obs_4_20190217-160454' #her_default_20190212-141935' # Good with just Ego
     #load_path = save_folder +'/'+ 'her_default_obs5_20190212-184024' # So-So with others
     ###############################################################
         

@@ -30,5 +30,5 @@ register(
 register(
     id='parking-v1',
     entry_point='urban_AD_env.envs:ParkingEnv',
-    tags={'wrapper_config.TimeLimit.max_episode_steps': 20}
+    tags={'wrapper_config.TimeLimit.max_episode_steps': 30}
 )

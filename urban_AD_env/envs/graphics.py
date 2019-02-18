@@ -13,8 +13,8 @@ class EnvViewer(object):
     """
         A viewer to render a urban_AD driving environment.
     """
-    SCREEN_WIDTH = 600
-    SCREEN_HEIGHT = 150
+    SCREEN_WIDTH = 600 * 2
+    SCREEN_HEIGHT = 150 * 2
     SAVE_IMAGES = False
 
     def __init__(self, env):

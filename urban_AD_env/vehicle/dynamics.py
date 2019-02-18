@@ -35,6 +35,7 @@ class Vehicle(Loggable):
         self.lane = self.road.network.get_lane(self.lane_index) if self.road else None
         self.action = {'steering': 0, 'acceleration': 0}
         self.crashed = False
+        self.is_success = False
         self.log = []
         self.manouver_start_time = datetime.timestamp(datetime.now()) 
 

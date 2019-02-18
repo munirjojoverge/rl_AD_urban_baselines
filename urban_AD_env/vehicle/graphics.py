@@ -30,21 +30,23 @@ class VehicleGraphics(object):
         """
         v = vehicle
         
-        if isinstance(v, Obstacle):
-            s = pygame.Surface((surface.pix(v.LENGTH), surface.pix(v.LENGTH)), pygame.SRCALPHA)  # per-pixel alpha
-            rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        
-            pygame.draw.rect(s, cls.get_color(v, transparent), rect, 0)        
-            pygame.draw.rect(s, cls.BLACK, rect, 1)                  
-        elif isinstance(v, ControlledVehicle):
-            s = pygame.image.load('./img/car_2.png')
-            s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))    
-        else:
-            s = pygame.image.load('./img/ego_2.png')
-            s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))
+        # if isinstance(v, Obstacle):
+        #     s = pygame.Surface((surface.pix(v.LENGTH), surface.pix(v.LENGTH)), pygame.SRCALPHA)  # per-pixel alpha
+        #     rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        
+        #     pygame.draw.rect(s, cls.get_color(v, transparent), rect, 0)        
+        #     pygame.draw.rect(s, cls.BLACK, rect, 1)                  
+        # elif isinstance(v, ControlledVehicle):
+        #     s = pygame.image.load('./img/car_2.png')
+        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))    
+        # else:
+        #     s = pygame.image.load('./img/ego_3.png')
+        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))
         
-        #rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        
-        #pygame.draw.rect(s, cls.get_color(v, transparent), rect, 0)        
-        #pygame.draw.rect(s, cls.BLACK, rect, 1)      
+        s = pygame.Surface((surface.pix(v.LENGTH), surface.pix(v.LENGTH)), pygame.SRCALPHA)  # per-pixel alpha
+        rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        
+        pygame.draw.rect(s, cls.get_color(v, transparent), rect, 0)        
+        pygame.draw.rect(s, cls.BLACK, rect, 1)      
+
         s = pygame.Surface.convert_alpha(s)
         h = v.heading if abs(v.heading) > 2 * np.pi / 180 else 0
         sr = pygame.transform.rotate(s, -h * 180 / np.pi)
