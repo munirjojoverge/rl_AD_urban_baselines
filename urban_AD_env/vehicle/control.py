@@ -173,8 +173,8 @@ class MDPVehicle(ControlledVehicle):
     """
 
     SPEED_COUNT = 3  # []
-    SPEED_MIN = 20  # [m/s]
-    SPEED_MAX = 30  # [m/s]
+    SPEED_MIN = 10  # [m/s]
+    SPEED_MAX = 40  # [m/s]
 
     def __init__(self,
                  road,

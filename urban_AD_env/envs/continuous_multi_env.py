@@ -144,12 +144,17 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
         return obs, reward, terminal, info
  
 
-    def _select_scene(self):        
-        self.scene = 0 #rd.randrange(0, len(self.SCENES)-1,1)
+    def _select_scene(self, scene=None):        
+        if scene==None:            
+            self.scene = rd.randrange(0, len(self.SCENES)-1,1)
+        else:
+            self.scene = scene
+
         self.config = self.SCENE_CONFIG[self.SCENES[self.scene]].copy()
        
         EnvViewer.SCREEN_HEIGHT = self.config['screen_height']
         EnvViewer.SCREEN_WIDTH = self.config['screen_width']  
+       
 
     def configure(self, config):
         self.config.update(config)
@@ -179,7 +184,7 @@ class ContinuousMultiEnv(AbstractEnv, GoalEnv):
 
     def reset(self):
         self.internal_reset()
-        self._select_scene()
+        self._select_scene(0)
         self._build_scene()
         self._populate_scene()
         return self._observation()

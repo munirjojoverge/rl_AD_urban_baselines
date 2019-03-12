@@ -1,7 +1,7 @@
 from gym.envs.registration import register
 
 register(
-    id='urban_AD-v1',
+    id='urban_AD-multilane-v1',
     entry_point='urban_AD_env.envs:MultiLaneEnv',
 )
 
@@ -30,5 +30,11 @@ register(
 register(
     id='parking-v1',
     entry_point='urban_AD_env.envs:ParkingEnv',
+    tags={'wrapper_config.TimeLimit.max_episode_steps': 20}
+)
+
+register(
+    id='sidepass-v0',
+    entry_point='urban_AD_env.envs:SidepassEnv',
     tags={'wrapper_config.TimeLimit.max_episode_steps': 30}
 )

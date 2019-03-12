@@ -5,14 +5,17 @@ from gym import logger
 from urban_AD_env import utils
 from urban_AD_env.envs.abstract import AbstractEnv
 from urban_AD_env.road.road import Road, RoadNetwork
+from urban_AD_env.road.lane import LineType, StraightLane
 from urban_AD_env.vehicle.control import MDPVehicle
+from urban_AD_env.vehicle.dynamics import Obstacle
+from urban_AD_env.envs.graphics import EnvViewer
 
 
 class MultiLaneEnv(AbstractEnv):
     """
         A urban_AD driving environment.
 
-        The vehicle is driving on a straight urban_AD with several lanes, and is rewarded for reaching a high velocity,
+        The vehicle is driving on a straight urban road with several lanes, and is rewarded for reaching a high velocity,
         staying on the rightmost lanes and avoiding collisions.
     """
 
@@ -22,7 +25,7 @@ class MultiLaneEnv(AbstractEnv):
     """ The reward received when driving on the right-most lanes, linearly mapped to zero for other lanes."""
     HIGH_VELOCITY_REWARD = 0.4
     """ The reward received when driving at full speed, linearly mapped to zero for lower speeds."""
-    LANE_CHANGE_REWARD = -0
+    LANE_CHANGE_REWARD = -0.0
     """ The reward received at each lane change action."""
 
     DIFFICULTY_LEVELS = {
@@ -30,28 +33,43 @@ class MultiLaneEnv(AbstractEnv):
             "lanes_count": 2,
             "initial_spacing": 2,
             "vehicles_count": 5,
+            "vehicle_radious": 100,         
+            "obstacles_count": 20,
+            "obstacles_radious": 100,
             "duration": 20,
             "other_vehicles_type": "urban_AD_env.vehicle.behavior.IDMVehicle",
             "centering_position": [0.3, 0.5],
-            "collision_reward": COLLISION_REWARD
+            "collision_reward": COLLISION_REWARD,
+            "screen_width": 1200,
+            "screen_height": 600
         },
         "MEDIUM": {
             "lanes_count": 3,
             "initial_spacing": 2,
             "vehicles_count": 10,
+            "vehicle_radious": 100,         
+            "obstacles_count": 20,
+            "obstacles_radious": 100,
             "duration": 30,
             "other_vehicles_type": "urban_AD_env.vehicle.behavior.IDMVehicle",
             "centering_position": [0.3, 0.5],
-            "collision_reward": COLLISION_REWARD
+            "collision_reward": COLLISION_REWARD,
+            "screen_width": 1200,
+            "screen_height": 600
         },
         "HARD": {
             "lanes_count": 4,
             "initial_spacing": 3,
-            "vehicles_count": 50,
-            "duration": 40,
+            "vehicles_count": 10,
+            "vehicle_radious": 100,         
+            "obstacles_count": 20,
+            "obstacles_radious": 100,
+            "duration": 30,
             "other_vehicles_type": "urban_AD_env.vehicle.behavior.IDMVehicle",
             "centering_position": [0.3, 0.5],
-            "collision_reward": COLLISION_REWARD
+            "collision_reward": COLLISION_REWARD,
+            "screen_width": 1200,
+            "screen_height": 600
         },
     }
 
@@ -60,6 +78,9 @@ class MultiLaneEnv(AbstractEnv):
         self.config = self.DIFFICULTY_LEVELS["HARD"].copy()
         self.steps = 0
         self.reset()
+        EnvViewer.SCREEN_HEIGHT = self.config['screen_height']
+        EnvViewer.SCREEN_WIDTH = self.config['screen_width']  
+
 
     def reset(self):
         self._create_road()
@@ -93,10 +114,26 @@ class MultiLaneEnv(AbstractEnv):
         """
             Create some new random vehicles of a given type, and add them on the road.
         """
-        self.vehicle = MDPVehicle.create_random(self.road, 25, spacing=self.config["initial_spacing"])
-        self.road.vehicles.append(self.vehicle)
+        ### Ego ###
+        ego_vehicle = MDPVehicle.create_random(self.road, 25, spacing=self.config["initial_spacing"])
+        ego_vehicle.lane
+        self.vehicle = ego_vehicle
+        self.road.vehicles.append(self.vehicle)   
 
-        vehicles_type = utils.class_from_path(self.config["other_vehicles_type"])
+        ### Obstacle ###
+        obstacle = Obstacle(self.road, ego_vehicle.position+[60,0])
+        self.road.vehicles.append(obstacle)
+        for _ in range(self.config["obstacles_count"]):
+            self.road.vehicles.append(Obstacle.create_random(self.road))
+
+        # if ego_vehicle.lane == self.config["lanes_count"]-1:
+        #     obstacle = Obstacle(self.road, ego_vehicle.position+[120, -StraightLane.DEFAULT_WIDTH])
+        # else:
+        #     obstacle = Obstacle(self.road, ego_vehicle.position+[120, -StraightLane.DEFAULT_WIDTH])
+        # self.road.vehicles.append(obstacle)
+
+        ### Other Vehicles
+        vehicles_type = utils.class_from_path(self.config["other_vehicles_type"])        
         for _ in range(self.config["vehicles_count"]):
             self.road.vehicles.append(vehicles_type.create_random(self.road))
 

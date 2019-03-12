@@ -35,12 +35,12 @@ class VehicleGraphics(object):
         #     rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        
         #     pygame.draw.rect(s, cls.get_color(v, transparent), rect, 0)        
         #     pygame.draw.rect(s, cls.BLACK, rect, 1)                  
-        # elif isinstance(v, ControlledVehicle):
-        #     s = pygame.image.load('./img/car_2.png')
-        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))    
-        # else:
+        # elif isinstance(v, MDPVehicle):
         #     s = pygame.image.load('./img/ego_3.png')
-        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*2.0)))
+        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*1.5)))    
+        # else:
+        #     s = pygame.image.load('./img/car_3.png')
+        #     s = pygame.transform.scale(s, (surface.pix(v.LENGTH*1.5),surface.pix(v.WIDTH*1.5)))
         
         s = pygame.Surface((surface.pix(v.LENGTH), surface.pix(v.LENGTH)), pygame.SRCALPHA)  # per-pixel alpha
         rect = (0, surface.pix(v.LENGTH) / 2 - surface.pix(v.WIDTH) / 2, surface.pix(v.LENGTH), surface.pix(v.WIDTH))        

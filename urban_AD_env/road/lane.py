@@ -116,7 +116,7 @@ class StraightLane(AbstractLane):
         :param start: the lane starting position [m]
         :param end: the lane ending position [m]
         :param width: the lane width [m]
-        :param line_types: the type of lines on both sides of the lane
+        :param line_types: the type of lines on both sides of the lane [left, right] in the direction of motion
         :param forbidden: is changing to this lane forbidden
         """
         super(StraightLane, self).__init__()

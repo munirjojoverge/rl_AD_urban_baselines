@@ -67,6 +67,7 @@ class IDMVehicle(ControlledVehicle):
         """
         if self.crashed:
             return
+
         action = {}
         front_vehicle, rear_vehicle = self.road.neighbour_vehicles(self)
 

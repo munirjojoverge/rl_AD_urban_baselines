@@ -5,3 +5,4 @@ from urban_AD_env.envs.roundabout_env import RoundaboutEnv
 from urban_AD_env.envs.continuous_env import ContinuousEnv
 from urban_AD_env.envs.continuous_multi_env import ContinuousMultiEnv
 from urban_AD_env.envs.parking_env import ParkingEnv
+from urban_AD_env.envs.sidepass_env import SidepassEnv

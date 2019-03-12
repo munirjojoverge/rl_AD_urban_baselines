@@ -74,9 +74,9 @@ class IntervalVehicle(LinearVehicle):
                                   - all: assume that any lane change decision is possible at any timestep
                                   - right: assume that a right lane change decision is possible at any timestep
         """
-        if self.crashed:
-            self.interval_observer = VehicleInterval(self)
-            return
+        # if self.crashed:
+        #     self.interval_observer = VehicleInterval(self)
+        #     return
 
         # Input state intervals
         position_i = self.interval_observer.position
@@ -289,7 +289,7 @@ class IntervalVehicle(LinearVehicle):
             return super(IntervalVehicle, self).check_collision(other)
 
         if not self.COLLISIONS_ENABLED or self.crashed or other is self:
-            return
+            return        
 
         # Fast rectangular pre-check
         if not utils.point_in_rectangle(other.position,

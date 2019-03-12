@@ -14,34 +14,64 @@ The Original version of these environments were created by Edouard Leurent and c
 
 ### Getting Started
 
-1. Clone/Download this repository
+Clone/Download this repository
 
-2. Install all the required libraries: pip install -r requirements.txt
+Install all the required libraries: pip install -r requirements.txt
 
-3. Install the urban_AD_env: 
+Install the urban_AD_env: 
 
-   cd urban_AD_env
+cd urban_AD_env
 
-   python setup.py install
+**python setup.py install**
 
-4. On main.py  "create_args()" function
+On **baslines_run.py**  you will find the "default_args()" function where you can setup the arguments that will be used to train and run the RL agent
 
-   1. Select what algorithm from Openai baselines (alg='---') you would like to use (take into account that some will fail since they are meant for discrete action spaces and at this point we are not automatically switching from Continuous to Discrete action spaces). For a list of the algorithms available look into the /baselines folder.
+1. env =  'urban_AD-v1' - **Chose the environment you want to use**. For a full list check "init__.py" on urban_AD_env folder
+2. alg = 'ppo2' - **Chose the RL algorithm you want to use**. For a full list check the folders inside open_ai_baselines/baselines. Take into account that some will fail since they are meant for discrete action spaces and at this point we are not automatically switching from Continuous to Discrete action spaces
+3. network = 'default' - **Chose the type of network you want to use**. Each algorithm can only handle certain network architectures. For more info you'll have to check inside the algorithm's folder you have selected. You can select  mlp, cnn, lstm, cnn_lstm, and conv_only otherwise Openai baselines will use a default one for the specific algorithm
+4. num_timesteps = '3e5'
+5. save_folder = models_folder + '/' + env +'/'+ alg + '/' + network 
+6. save_file = save_folder + '/' + str(currentDT)
+7. logger_path = save_file + '_log'
+8. load_path = save_folder +'/'+ 'XXX' 
+9. "Play" will launch render the environment and run the agent after training. (comment this line if you don't want to run the agent after training or if you can't visualize it - such as when you are training the agent on AWS, for example)
 
-   2. You may also select the "network" type (mlp, cnn, lstm, cnn_lstm, conv_only) otherwise Openai baselines will use a default one for the specific algorithm. 
+Look at the other arguments and chose the appropriate values such us where to save, number steps, etc...
 
-   3. Look at the other arguments and chose the appropriate values such us where to save, number steps,...
+Note: "Save path" does not work on DDPG unless you add to the ddpg class the following: 
 
-   4. Note: "Save path" does not work on DDPG unless you add to the ddpg class the following: 
-   
-      from baselines.common import tf_util
+from baselines.common import tf_util
 
-      def save(self, save_path):
+def save(self, save_path):
 
-      ​        tf_util.save_variables(save_path)
+​        tf_util.save_variables(save_path)
 
-      "Play" will launch the visualization and run the agent after training. (comment this line if you don't want to run the agent after training or if you can't visualize it - such as when you are training the agent on AWS, for example)
+Comment the lines on DEFAULT_ARGUMENTS as shown below if you want to skip certain parameters
 
-5. Run main_gym.py:
+DEFAULT_ARGUMENTS = [
 
-   python main_gym.py
+​        '--env=' + env,
+
+​        '--alg=' + alg,
+
+​    \#    '--network=' + network,
+
+​        '--num_timesteps=' + num_timesteps,    
+
+​    \#    '--num_env=0',
+
+​        '--save_path=' + save_file,
+
+​     /#   '--load_path=' + load_path,
+
+​        '--logger_path=' + logger_path,
+
+​        '--play'
+
+​    ]
+
+### How to Run
+
+On the command prompt:
+
+python baselines_run.py

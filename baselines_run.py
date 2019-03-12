@@ -42,14 +42,15 @@ def default_args():
     ###############################################################
     #            DEFINE YOUR "BASELINES" PARAMETERS HERE 
     ###############################################################
-    env = 'parking-v1' #'continuous-multi-env-v1' #'continuous-env-v1' 'parking-v1'
+    env =  'parking-v1' #'urban_AD-multilane-v1' #'sidepass-v0' #'urban_AD-merge-v1' #'parking-v1' #'continuous-multi-env-v1' #'continuous-env-v1' 'parking-v1'
     alg = 'her'
     network = 'default'
-    num_timesteps = '1e6'
-    save_folder = models_folder + '/' + env
-    save_path = save_folder +'/'+ alg + '_' + network + '_obs_4_' + str(currentDT)
-    load_path = save_folder +'/'+ 'her_default_obs_4_20190217-160454' #her_default_20190212-141935' # Good with just Ego
-    #load_path = save_folder +'/'+ 'her_default_obs5_20190212-184024' # So-So with others
+    num_timesteps = '3e4'
+    save_folder = models_folder + '/' + env +'/'+ alg + '/' + network 
+    save_file = save_folder + '/' + str(currentDT)
+    logger_path = save_file + '_log'
+    load_path = save_folder +'/'+ '20190228-174333' #her_default_20190212-141935' # Good with just Ego
+    # load_path = save_folder +'/'+ 'her_default_obs5_20190212-202901' # So-So with others
     ###############################################################
         
     try:  
@@ -62,11 +63,12 @@ def default_args():
     DEFAULT_ARGUMENTS = [
         '--env=' + env,
         '--alg=' + alg,
-        '--network=' + network,
+    #    '--network=' + network,
         '--num_timesteps=' + num_timesteps,    
-        '--num_env=0',
-        '--save_path=' + save_path,
+    #    '--num_env=0',
+        '--save_path=' + save_file,
         '--load_path=' + load_path,
+        '--logger_path=' + logger_path,
         '--play'
     ]
 

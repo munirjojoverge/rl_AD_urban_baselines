@@ -21,7 +21,7 @@ class Vehicle(Loggable):
     """ Vehicle length [m] """
     WIDTH = 2.0
     """ Vehicle width [m] """
-    DEFAULT_VELOCITIES = [23, 25]
+    DEFAULT_VELOCITIES = [23, 40]
     """ Range for random initial velocities [m/s] """
     MAX_VELOCITY = 45
     """ Maximum reachable velocity [m/s] """
@@ -127,6 +127,7 @@ class Vehicle(Loggable):
         if self.crashed:
             self.action['steering'] = 0
             self.action['acceleration'] = -1.0*self.velocity
+            
         if self.velocity > self.MAX_VELOCITY:
             self.action['acceleration'] = min(self.action['acceleration'], 1.0*(self.MAX_VELOCITY - self.velocity))
         elif self.velocity < -self.MAX_VELOCITY:
@@ -159,7 +160,7 @@ class Vehicle(Loggable):
         :param other: the other vehicle
         """
         if not self.COLLISIONS_ENABLED or not other.COLLISIONS_ENABLED or self.crashed or other is self:
-            return
+            return       
 
         # Fast spherical pre-check
         if np.linalg.norm(other.position - self.position) > self.LENGTH:
